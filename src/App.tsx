@@ -1,15 +1,24 @@
 import { useState } from "react";
 import Card from "./data";
+import type React from "react";
 
 type Item = {
   id: string;
   text: string;
   done: boolean;
 };
+type Filter = "all" | "active" | "done";
 
 const App = () => {
   const [text, setText] = useState<string>("");
   const [data, setData] = useState<Item[]>([]);
+  const [filter, setFilter] = useState<Filter>("all");
+
+  const filteredData = data.filter((i) => {
+    if (filter === "active") return !i.done;
+    if (filter === "done") return i.done;
+    return true;
+  });
 
   const add = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,7 +68,7 @@ const App = () => {
       </form>
       <div className="w-[70%] mt-4">
         <div className="flex flex-col gap-2">
-          {data.map((item) => (
+          {filteredData.map((item) => (
             <Card
               key={item.id}
               item={item}
@@ -69,9 +78,53 @@ const App = () => {
           ))}
         </div>
       </div>
-      <div className="mt-4 flex items-center gap-4">
-        <span>Active: {activeCount}</span>
-        <span>Done: {doneCount}</span>
+      <div className="mt-6 w-[70%] flex items-center justify-between border rounded-md px-4 py-3 bg-gray-50">
+        {/* LEFT SIDE — COUNTS */}
+        <div className="flex items-center gap-4 text-sm">
+          <span className="px-3 py-1 rounded-full bg-white border">
+            Active: <b>{activeCount}</b>
+          </span>
+
+          <span className="px-3 py-1 rounded-full bg-white border">
+            Done: <b>{doneCount}</b>
+          </span>
+        </div>
+
+        {/* RIGHT SIDE — FILTER BUTTONS */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-3 py-1 rounded-md text-sm transition ${
+              filter === "all"
+                ? "bg-black text-white"
+                : "bg-white border hover:bg-gray-100"
+            }`}
+          >
+            All
+          </button>
+
+          <button
+            onClick={() => setFilter("active")}
+            className={`px-3 py-1 rounded-md text-sm transition ${
+              filter === "active"
+                ? "bg-black text-white"
+                : "bg-white border hover:bg-gray-100"
+            }`}
+          >
+            Active
+          </button>
+
+          <button
+            onClick={() => setFilter("done")}
+            className={`px-3 py-1 rounded-md text-sm transition ${
+              filter === "done"
+                ? "bg-black text-white"
+                : "bg-white border hover:bg-gray-100"
+            }`}
+          >
+            Done
+          </button>
+        </div>
       </div>
     </div>
   );
